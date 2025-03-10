@@ -101,6 +101,9 @@ function Install-YARA {
     New-Item -ItemType Directory -Path $yaraDir -Force
     Copy-Item -Path "$env:TEMP\yara64.exe" -Destination $yaraDir
 
+    $yaraDirRules = "C:\Program Files (x86)\ossec-agent\active-response\bin\yara\rules"
+    New-Item -ItemType Directory -Path $yaraDirRules -Force
+
     # Download Yara Rules
     $yaraRulesUrl = "https://github.com/whiterabb17/ossec-yara/raw/refs/heads/main/rules/yara_rules.yar"
     

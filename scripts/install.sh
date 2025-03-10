@@ -147,20 +147,20 @@ restart_wazuh_agent() {
     case "$(uname)" in
         Linux)
             if maybe_sudo /var/ossec/bin/wazuh-control restart >/dev/null 2>&1; then
-                info_message "Wazuh agent restarted successfully."
+                info_message "Sentury agent restarted successfully."
             else
-                error_message "Error occurred during Wazuh agent restart."
+                error_message "Error occurred during Sentury agent restart."
             fi
             ;;
         Darwin)
             if maybe_sudo /Library/Ossec/bin/wazuh-control restart >/dev/null 2>&1; then
-                info_message "Wazuh agent restarted successfully."
+                info_message "Sentury agent restarted successfully."
             else
-                error_message "Error occurred during Wazuh agent restart."
+                error_message "Error occurred during Sentury agent restart."
             fi
             ;;
         *)
-            error_message "Unsupported operating system for restarting Wazuh agent."
+            error_message "Unsupported operating system for restarting Sentury agent."
             exit 1
             ;;
     esac
@@ -389,7 +389,7 @@ print_step 3 "Downloading yara.sh script..."
 download_yara_script
 
 # Step 4: Update Wazuh agent configuration file
-print_step 4 "Updating Wazuh agent configuration file..."
+print_step 4 "Updating Sentury agent configuration file..."
 
 # Check if the OSSEC configuration file exists
 if maybe_sudo [ -f "$OSSEC_CONF_PATH" ]; then
@@ -403,12 +403,12 @@ else
 fi
 
 # Step 5: Restart Wazuh agent
-print_step 5 "Restarting Wazuh agent..."
+print_step 5 "Restarting Sentury agent..."
 
 restart_wazuh_agent || {
-    error_message "Error occurred during Wazuh agent restart."
+    error_message "Error occurred during Sentury agent restart."
 }
-info_message "Wazuh agent restarted successfully."
+info_message "Sentury agent restarted successfully."
 
 # Validate yara installation
 validate_installation() {

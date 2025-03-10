@@ -102,7 +102,7 @@ function Install-YARA {
     Copy-Item -Path "$env:TEMP\yara64.exe" -Destination $yaraDir
 
     # Download Yara Rules
-    $yaraRulesUrl = "https://raw.githubusercontent.com/ADORSYS-GIS/Sentury-yara/refs/heads/enhance/Issue-8/rules/yara_rules.yar"
+    $yaraRulesUrl = "https://github.com/whiterabb17/ossec-yara/raw/refs/heads/main/rules/yara_rules.yar"
     
     # Define the file path to save the YARA rules
     # $yaraRulesFile = "$env:TEMP\yara_rules.yar"
@@ -133,7 +133,7 @@ if (Test-Path -Path $yaraRulesPath) {
 }
 
     #Download the yara.bat script
-    $yaraBatURL = "https://raw.githubusercontent.com/ADORSYS-GIS/Sentury-yara/refs/heads/3-Windows-Agent-Install-Script/scripts/yara.bat"
+    $yaraBatURL = "https://github.com/whiterabb17/ossec-yara/raw/refs/heads/main/scripts/yara.exe"
     $yaraBatDir =  "C:\Program Files (x86)\ossec-agent\active-response\bin\yara.exe"
     
     

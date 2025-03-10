@@ -109,13 +109,14 @@ function Install-YARA {
     
     # Define the file path to save the YARA rules
     # $yaraRulesFile = "$env:TEMP\yara_rules.yar"
-    $yaraRulesFile = "C:\Program Files (x86)\ossec-agent\active-response\bin\yara\rules\yara_rules.yar"
-    
+    $yaraRulesFile = "C:\Program Files (x86)\ossec-agent\active-response\bin\yara\yara_rules.yar"
+
     # Download the YARA rules file
     try {
         InfoMessage "Downloading YARA rules from GitHub..."
         Invoke-WebRequest -Uri $yaraRulesUrl -OutFile $yaraRulesFile -UseBasicParsing
-        InfoMessage "YARA rules saved to $yaraRulesFile" 
+        Move-Item -Path $yaraRulesFile -Destination $yaraDirRules
+        InfoMessage "YARA rules saved to $yaraDirRules" 
     } catch {
         ErrorMessage "Failed to download YARA rules: $_" 
         exit 1

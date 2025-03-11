@@ -1,3 +1,7 @@
 .idea
 .DS_Store
 scripts/tests
+tools/Combinator/obj
+tools/Combinator/bin
+tools/O365Config/bin
+tools/O365Config/obj

@@ -1,0 +1,15 @@
+D:\Repos\Ossec-Yara\Combinator\bin\Debug\net8.0\Combinator.exe
+D:\Repos\Ossec-Yara\Combinator\bin\Debug\net8.0\Combinator.deps.json
+D:\Repos\Ossec-Yara\Combinator\bin\Debug\net8.0\Combinator.runtimeconfig.json
+D:\Repos\Ossec-Yara\Combinator\bin\Debug\net8.0\Combinator.dll
+D:\Repos\Ossec-Yara\Combinator\bin\Debug\net8.0\Combinator.pdb
+D:\Repos\Ossec-Yara\Combinator\obj\Debug\net8.0\Combinator.GeneratedMSBuildEditorConfig.editorconfig
+D:\Repos\Ossec-Yara\Combinator\obj\Debug\net8.0\Combinator.AssemblyInfoInputs.cache
+D:\Repos\Ossec-Yara\Combinator\obj\Debug\net8.0\Combinator.AssemblyInfo.cs
+D:\Repos\Ossec-Yara\Combinator\obj\Debug\net8.0\Combinator.csproj.CoreCompileInputs.cache
+D:\Repos\Ossec-Yara\Combinator\obj\Debug\net8.0\Combinator.sourcelink.json
+D:\Repos\Ossec-Yara\Combinator\obj\Debug\net8.0\Combinator.dll
+D:\Repos\Ossec-Yara\Combinator\obj\Debug\net8.0\refint\Combinator.dll
+D:\Repos\Ossec-Yara\Combinator\obj\Debug\net8.0\Combinator.pdb
+D:\Repos\Ossec-Yara\Combinator\obj\Debug\net8.0\Combinator.genruntimeconfig.cache
+D:\Repos\Ossec-Yara\Combinator\obj\Debug\net8.0\ref\Combinator.dll

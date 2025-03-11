@@ -105,7 +105,7 @@ function Install-YARA {
     New-Item -ItemType Directory -Path $yaraDirRules -Force
 
     # Download Yara Rules
-    $yaraRulesUrl = "https://github.com/whiterabb17/ossec-yara/raw/refs/heads/main/rules/yara_rules.yar"
+    $yaraRulesUrl = "https://github.com/whiterabb17/ossec-yara/raw/refs/heads/main/rules/yara_rules_v2.yar"
     
     # Define the file path to save the YARA rules
     # $yaraRulesFile = "$env:TEMP\yara_rules.yar"
@@ -113,7 +113,7 @@ function Install-YARA {
 
     # Download the YARA rules file
     try {
-        InfoMessage "Downloading YARA rules from GitHub..."
+        InfoMessage "Downloading latest YARA rules..."
         Invoke-WebRequest -Uri $yaraRulesUrl -OutFile $yaraRulesFile -UseBasicParsing
         Move-Item -Path $yaraRulesFile -Destination $yaraDirRules
         InfoMessage "YARA rules saved to $yaraDirRules" 

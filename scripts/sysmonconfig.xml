@@ -2700,5 +2700,21 @@
         <TargetFilename condition="begin with">C:\Windows\SysWOW64\Tasks</TargetFilename>
       </FileExecutableDetected>
     </RuleGroup>
-  </EventFiltering>
-</Sysmon>
+    <!-- This configuration records the malicious activities of Remcos RAT in Microsoft event viewer -->
+    <RuleGroup groupRelation="or">
+      <RegistryEvent onmatch="include">
+        <Rule groupRelation="and">
+          <EventType condition="is">CreateKey</EventType>
+          <TargetObject condition="begin with">HKU</TargetObject>
+          <TargetObject condition="contains any">Remcos;hpsupport</TargetObject>
+        </Rule>
+       </RegistryEvent>
+     </RuleGroup>
+     <RuleGroup groupRelation="or">
+       <FileCreate onmatch="include">
+         <TargetFilename condition="contains">\AppData\Roaming\</TargetFilename>
+         <TargetFilename condition="contains">\AppData\Local\</TargetFilename>
+       </FileCreate>
+     </RuleGroup>
+   </EventFiltering>
+ </Sysmon>

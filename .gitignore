@@ -6,3 +6,4 @@ tools/Combinator/bin
 tools/O365Config/bin
 tools/O365Config/obj
 scripts/yara_private.py
+scripts/yara.exe

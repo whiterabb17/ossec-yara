@@ -1,0 +1,297 @@
+<!-- Local Decoders -->
+
+<!-- Modify it at your will. -->
+<!-- Copyright (C) 2015, Wazuh Inc. -->
+
+<!--
+  - Allowed static fields:
+  - location   - where the log came from (only on FTS)
+  - srcuser    - extracts the source username
+  - dstuser    - extracts the destination (target) username
+  - user       - an alias to dstuser (only one of the two can be used)
+  - srcip      - source ip
+  - dstip      - dst ip
+  - srcport    - source port
+  - dstport    - destination port
+  - protocol   - protocol
+  - id         - event id
+  - url        - url of the event
+  - action     - event action (deny, drop, accept, etc)
+  - status     - event status (success, failure, etc)
+  - extra_data - Any extra data
+-->
+
+<!-- 
+  Castle Decoder
+-->
+<decoder name="Castle_decoder">
+  <prematch>CastleLogger:</prematch>
+</decoder>
+
+<!-- Log Type -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">CastleLogger: (\S+)</regex>
+  <order>Castle.log_type</order>
+</decoder>
+
+<!-- Protected Domain address -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">WhiteKnight@(\S+)</regex>
+  <order>Castle.protected_domain</order>
+</decoder>
+
+<!-- Full Log event -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">castle-event: (.*)</regex>
+  <order>Castle.whiteknight_log</order>
+</decoder>
+
+<!-- Start time of malware scan -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">start-time: (\S+) (\S+)</regex>
+  <order>Castle.start_time</order>
+</decoder>
+
+<!-- End time of malware scan -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">end-time: (\S+) (\S+)</regex>
+  <order>Castle.end_time</order>
+</decoder>
+
+<!-- Total time of malware scan -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">total-time: (\d+)</regex>
+  <order>Castle.total_time</order>
+</decoder>
+
+<!-- Base directory of malware scan -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">base-directory: (\S+)</regex>
+  <order>Castle.base_directory</order>
+</decoder>
+
+<!-- Total directories scanned during malware scan -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">total-directories-scanned: (\d+)</regex>
+  <order>Castle.total_directories_scanned</order>
+</decoder>
+
+<!-- Total files scanned during malware scan -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">total-files-scanned: (\d+)</regex>
+  <order>Castle.total_files_scanned</order>
+</decoder>
+
+<!-- Total malware identified -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">total-malware-identified: (\d+)</regex>
+  <order>Castle.total_malware_identified</order>
+</decoder>
+
+<!-- Error log from webserver/whiteknight -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">error-log: (.*)</regex>
+  <order>Castle.error_log</order>
+</decoder>
+
+<!-- Threat type from active-protection -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">threat: (\S+)</regex>
+  <order>Castle.threat_type</order>
+</decoder>
+
+<!-- IP of Log from Active-protection -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">attackerIP: (\d+\.\d+\.\d+\.\d+)</regex>
+  <order>Castle.attacker_ip</order>
+</decoder>
+
+<!-- Browser type from active-protection log -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">browser: (\S+)</regex>
+  <order>Castle.browser</order>
+</decoder>
+
+<!-- Operating System from active-protection log -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">os: (\S+)</regex>
+  <order>Castle.operating_system</order>
+</decoder>
+
+<!-- Browser type from active-protection log -->
+<decoder name="Castle_child">
+  <parent>Castle_decoder</parent>
+  <regex type="pcre2">referer: (\S+)</regex>
+  <order>Castle.referer</order>
+</decoder>
+<!--
+  End Castle Decoder
+-->
+
+<!--
+  Umbrella Decoder
+-->
+<decoder name="Umbrella_decoder">
+  <prematch>sentury-Umbrella:</prematch>
+</decoder>
+
+<decoder name="Umbrella_child">
+  <parent>Umbrella_decoder</parent>
+  <regex type="pcre2">sentury-Umbrella: (\S+)</regex>
+  <order>Umbrella.log_type</order>
+</decoder>
+
+<decoder name="Umbrella_child">
+  <parent>Umbrella_decoder</parent>
+  <regex type="pcre2">Complete: (\S+)</regex>
+  <order>Umbrella.complete</order>
+</decoder>
+
+<decoder name="Umbrella_child">
+  <parent>Umbrella_decoder</parent>
+  <regex type="pcre2">Running: (\S+)</regex>
+  <order>Umbrella.running</order>
+</decoder>
+
+<decoder name="Umbrella_child">
+  <parent>Umbrella_decoder</parent>
+  <regex type="pcre2">Output: (.*)</regex>
+  <order>Umbrella.output</order>
+</decoder>
+
+<decoder name="Umbrella_child">
+  <parent>Umbrella_decoder</parent>
+  <regex type="pcre2">Status: (\S+)</regex>
+  <order>Umbrella.status</order>
+</decoder>
+
+<decoder name="Umbrella_child">
+  <parent>Umbrella_decoder</parent>
+  <regex type="pcre2">Malicious_IP_Count: (\d+)</regex>
+  <order>Umbrella.malicious_ip_count</order>
+</decoder>
+
+<decoder name="Umbrella_child">
+  <parent>Umbrella_decoder</parent>
+  <regex type="pcre2">Malicious_Attempt_Count: (\d+)</regex>
+  <order>Umbrella.malicious_attempt_count</order>
+</decoder>
+<!--
+  End Umbrella Decoder
+  -->
+
+<!--
+  YARA Decoder
+-->
+<decoder name="YARA_decoder">
+  <prematch>wazuh-YARA:</prematch>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">wazuh-YARA: (\S+)</regex>
+  <order>YARA.log_type</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">Scan result: (\S+)\s+</regex>
+  <order>YARA.rule_name</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">\[description="([^"]+)",</regex>
+  <order>YARA.rule_description</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">author="([^"]+)",</regex>
+  <order>YARA.rule_author</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">reference="([^"]+)",</regex>
+  <order>YARA.reference</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">date="([^"]+)",</regex>
+  <order>YARA.published_date</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">score =(\d+),</regex>
+  <order>YARA.threat_score</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">customer="([^"]+)",</regex>
+  <order>YARA.api_customer</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">hash1="([^"]+)",</regex>
+  <order>YARA.file_hash</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">tags="([^"]+)",</regex>
+  <order>YARA.tags</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">minimum_YARA="([^"]+)"\]</regex>
+  <order>YARA.minimum_YARA_version</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">\] (.*) \|</regex>
+  <order>YARA.scanned_file</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">chatgpt_response: (.*)</regex>
+  <order>YARA.chatgpt_response</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">Successfully deleted (.*)</regex>
+  <order>YARA.file_deleted</order>
+</decoder>
+
+<decoder name="YARA_child">
+  <parent>YARA_decoder</parent>
+  <regex type="pcre2">Unable to delete (.*)</regex>
+  <order>YARA.file_not_deleted</order>
+</decoder>
+
+<decoder name="local_decoder_example">
+    <program_name>local_decoder_example</program_name>
+</decoder>

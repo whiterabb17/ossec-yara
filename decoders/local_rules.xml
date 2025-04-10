@@ -1,0 +1,595 @@
+<!-- Local rules -->
+
+<!-- Modify it at your will. -->
+<!-- Copyright (C) 2015, Wazuh Inc. -->
+
+<!-- Local Changes to Rules -->
+<group name="ossec,">
+  <rule id="100050" level="0">
+    <if_sid>530</if_sid>
+    <match>^ossec: output: 'process list'</match>
+    <description>List of running processes.</description>
+    <group>process_monitor,</group>
+  </rule>
+
+  <rule id="100051" level="7" ignore="900">
+    <if_sid>100050</if_sid>
+    <match>nc -l</match>
+    <description>netcat listening for incoming connections.</description>
+    <group>process_monitor,</group>
+  </rule>
+</group>
+
+<!-- Castle Rules -->
+<group name="castle,whiteknight,syslog">
+  <rule id="189000" level="0">
+    <decoded_as>Castle_decoder</decoded_as>
+    <description>Castle grouping rule</description>
+  </rule>
+  <rule id="189001" level="11">
+    <if_sid>189000</if_sid>
+    <match>CastleLogger: Active Protection</match>
+    <!-- <description>$(Castle.whiteknight_log)</description> -->
+    <description>WhiteKnight at $(Castle.protected_domain) blocked a $(Castle.threat_type) from $(Castle.attacker_ip) using $(Castle.browser) on $(Castle.operating_system)</description>
+  </rule>
+  <rule id="189002" level="11">
+    <if_sid>189000</if_sid>
+    <field name="Castle.total_files_scanned">\.</field>
+    <match>CastleLogger: Malware Scan</match>
+    <description>WhiteKnight at $(Castle.protected_domain) finished Malware scan. Files scanned: $(Castle.total_files_scanned). Suspicious Files: $(Castle.total_malware_identified)</description>
+    <options>no_full_log</options>
+    <mitre>
+      <id>T1203</id>
+    </mitre>
+  </rule>
+  <rule id="189003" level="11">
+    <if_sid>189000</if_sid>
+    <field name="Castle.error_log">\.</field>
+    <match>CastleLogger: Error Log</match>
+    <description>WhiteKnight at $(Castle.protected_domain) has detected a website error: $(Castle.error_location)</description>
+    <options>no_full_log</options>
+  </rule>
+  <rule id="189004" level="15">
+    <if_sid>189001</if_sid>
+    <match>threat: SQL Injection</match>
+    <description>WhiteKnight at $(Castle.protected_domain) has blocked an SQLi Attack from $(Castle.attacker_ip)</description>
+    <mitre>
+      <id>T1203</id>
+    </mitre>
+  </rule>
+  <rule id="189005" level="15">
+    <if_sid>189001</if_sid>
+    <match>threat: Cross Site-Scripting</match>
+    <description>WhiteKnight at $(Castle.protected_domain) has blocked an XSS Attack from $(Castle.attacker_ip)</description>
+    <mitre>
+      <id>T1203</id>
+    </mitre>
+  </rule>
+</group>
+<!-- End Castle Rules -->
+
+<!-- Umbrella Decoder -->
+<group name="umbrella,sshd,pam,syslog,authentication_failed">
+  <rule id="199000" level="0">
+    <decoded_as>Umbrella_decoder</decoded_as>
+    <description>Umbrella grouping rule</description>
+  </rule>
+  <rule id="199001" level="11">
+    <if_sid>199000</if_sid>
+    <field name="agent.name">\.</field>
+    <match>sentury-Umbrella: INFO</match>
+    <description>Umbrella is gathering IPAddresses that are deemed to be making malicious unauthorized access attempts on "$(agent.name)"</description>
+    <mitre>
+        <id>T1110,T1110.001</id>
+    </mitre>
+    
+  </rule>
+
+  <rule id="199002" level="11">
+    <if_sid>199000</if_sid>
+    <field name="agent.name">\.</field>
+    <match>sentury-Umbrella: NOTICE</match>
+    <description>Umbrella successfully blocked "$(Umbrella.malicious_ip_count)" IPAddresses that made unauthorized access attempts that were deemed to be malicious on "$(agent.name)"</description>
+    <mitre>
+        <id>T1110,T1110.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="199003" level="11">
+    <if_sid>199000</if_sid>
+    <field name="Umbrella.malicious_ip_count">\.</field>
+    <description>Umbrella has blocked $(Umbrella.malicious_ip_count) IPAddresses that have attempted to make unauthorized access attempts (Brute Forcing)</description>
+    <mitre>
+        <id>T1110</id>
+        <id>T1110.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="108004" level="11">
+    <if_sid>199000</if_sid>
+    <field name="Umbrella.malicious_attempt_count">\.</field>
+    <description>Umbrella is sorting through $(Umbrella.malicious_attempt_count) malicious access attempts looking for unique IPAddresses</description>
+    <mitre>
+        <id>T1110</id>
+        <id>T1110.001</id>
+    </mitre>
+  </rule>
+<!--
+  <rule id="199005" level="15">
+    <if_sid>199000</if_sid>
+    <field name="full_log">Umbrella</field>
+    <description>Umbrella is blocking all malicious IPAddress's attempting to Bruteforce into $(agent.name)</description>
+    <mitre>
+        <id>T1110,T1110.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="199003" level="15">
+    <if_sid>199000</if_sid>
+    <field name="agent.name">\.</field>
+    <match>sentury-Umbrella: INFO</match>
+    <description>Umbrella is blocking malicious SSH login attempts on $(agent.name)</description>
+    <mitre>
+        <id>T1110,T1110.001</id>
+    </mitre>
+  </rule>
+-->
+</group>
+
+<!-- End Umbrella Decoder -->
+<!-- YARA Rule Group -->
+<group name="syscheck,">
+  <rule id="100300" level="5">
+    <if_sid>550</if_sid>
+    <field name="file">/home</field>
+    <description>File modified in /home directory.</description>
+  </rule>
+
+  <rule id="100301" level="5">
+    <if_sid>554</if_sid>
+    <field name="file">/home</field>
+    <description>File added to /home directory.</description>
+  </rule>
+
+  <rule id="100302" level="5">
+    <if_sid>550</if_sid>
+    <field name="file">/opt</field>
+    <description>File modified to /opt directory.</description>
+  </rule>
+
+  <rule id="100303" level="5">
+    <if_sid>554</if_sid>
+    <field name="file">/opt</field>
+    <description>File added to /opt directory.</description>
+  </rule>
+
+  <rule id="100306" level="5">
+    <if_sid>550</if_sid>
+    <field name="file" type="pcre2">(?i)C:\\Users.+Downloads</field>
+    <description>File modified in the downloads directory.</description>
+  </rule>
+
+  <rule id="100307" level="5">
+    <if_sid>554</if_sid>
+    <field name="file" type="pcre2">(?i)C:\\Users.+Downloads</field>
+    <description>File added to the downloads directory.</description>
+  </rule>
+<!--
+  <rule id="100304" level="5">
+    <if_sid>550</if_sid>
+    <field name="file" type="pcre2">(?i)D:\\Repos.+TestFolder</field>
+    <description>File modified in the Test Folder.</description>
+  </rule>
+
+  <rule id="100305" level="5">
+    <if_sid>554</if_sid>
+    <field name="file" type="pcre2">(?i)D:\\Repos.+TestFolder</field>
+    <description>File added in Test Folder.</description>
+  </rule>
+-->
+  <rule id="100308" level="5">
+    <if_sid>550</if_sid>
+    <field name="file" type="pcre2">(?i)C:\\Windows.+Temp</field>
+    <description>File modified in the System Temp directory.</description>
+  </rule>
+
+  <rule id="100309" level="5">
+    <if_sid>554</if_sid>
+    <field name="file" type="pcre2">(?i)C:\\Windows.+Temp</field>
+    <description>File added to the System Temp directory.</description>
+  </rule>
+
+ <rule id="100310" level="5">
+    <if_sid>550</if_sid>
+    <field name="file" type="pcre2">(?i)C:\\Users.+AppData.+Local.+Temp</field>
+    <description>File modified in the Users Temp directory.</description>
+  </rule>
+
+  <rule id="100311" level="5">
+    <if_sid>554</if_sid>
+    <field name="file" type="pcre2">(?i)C:\\Users.+AppData.+Local.+Temp</field>
+    <description>File added to the Users Temp directory.</description>
+  </rule>
+</group>
+
+<group name="yara,">
+  <rule id="108000" level="0">
+    <decoded_as>YARA_decoder</decoded_as>
+    <description>YARA grouping rule</description>
+  </rule>
+  <rule id="108001" level="15">
+    <if_sid>108000</if_sid>
+    <match>wazuh-YARA: INFO - Scan result: </match>
+    <description>File "$(YARA.scanned_file)" is a positive match for YARA rule: $(YARA.rule_name)</description>
+    <mitre>
+        <id>T1203</id>
+    </mitre>
+  </rule>
+
+  <rule id="108002" level="15">
+    <if_sid>108000</if_sid>
+    <field name="yara.file_deleted">\.</field>
+    <description>Active response successfully removed malicious file "$(YARA.file_deleted)"</description>
+  </rule>
+
+  <rule id="108003" level="15">
+    <if_sid>108000</if_sid>
+    <field name="YARA.file_not_deleted">\.</field>
+    <description>Active response unable to delete malicious file "$(YARA.file_not_deleted)"</description>
+    <mitre>
+        <id>T1203</id>
+    </mitre>
+  </rule>
+</group>
+
+<!-- End YARA Rule Group -->
+
+<!-- Powershell Logging Rule Group -->
+<group name="windows,powershell,">
+
+  <rule id="100201" level="8">
+    <if_sid>60009</if_sid>
+    <field name="win.eventdata.payload" type="pcre2">(?i)CommandInvocation</field>
+    <field name="win.system.message" type="pcre2">(?i)EncodedCommand|FromBase64String|EncodedArguments|-e\b|-enco\b|-en\b</field>
+    <description>Encoded command executed via PowerShell.</description>
+    <mitre>
+      <id>T1059.001</id>
+      <id>T1562.001</id>
+    </mitre>
+  </rule>
+  
+  <rule id="100202" level="4">
+    <if_sid>60009</if_sid>
+    <field name="win.system.message" type="pcre2">(?i)blocked by your antivirus software</field>
+    <description>Windows Security blocked malicious command executed via PowerShell.</description>
+    <mitre>
+      <id>T1059.001</id>  
+    </mitre>
+  </rule>
+
+  <rule id="100203" level="10">
+    <if_sid>60009</if_sid>
+    <field name="win.eventdata.payload" type="pcre2">(?i)CommandInvocation</field>    
+    <field name="win.system.message" type="pcre2">(?i)Add-Persistence|Find-AVSignature|Get-GPPAutologon|Get-GPPPassword|Get-HttpStatus|Get-Keystrokes|Get-SecurityPackages|Get-TimedScreenshot|Get-VaultCredential|Get-VolumeShadowCopy|Install-SSP|Invoke-CredentialInjection|Invoke-DllInjection|Invoke-Mimikatz|Invoke-NinjaCopy|Invoke-Portscan|Invoke-ReflectivePEInjection|Invoke-ReverseDnsLookup|Invoke-Shellcode|Invoke-TokenManipulation|Invoke-WmiCommand|Mount-VolumeShadowCopy|New-ElevatedPersistenceOption|New-UserPersistenceOption|New-VolumeShadowCopy|Out-CompressedDll|Out-EncodedCommand|Out-EncryptedScript|Out-Minidump|PowerUp|PowerView|Remove-Comments|Remove-VolumeShadowCopy|Set-CriticalProcess|Set-MasterBootRecord</field>
+    <description>Risky CMDLet executed. Possible malicious activity detected.</description>
+    <mitre>
+      <id>T1059.001</id>  
+    </mitre>
+  </rule>
+
+  <rule id="100204" level="8">
+    <if_sid>91802</if_sid>
+    <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)mshta.*GetObject|mshta.*new ActiveXObject</field>
+    <description>Mshta used to download a file. Possible malicious activity detected.</description>
+    <mitre>
+      <id>T1059.001</id>  
+    </mitre>
+  </rule>
+
+  <rule id="100205" level="5">
+    <if_sid>60009</if_sid>
+    <field name="win.eventdata.contextInfo" type="pcre2">(?i)ExecutionPolicy bypass|exec bypass</field>
+    <description>PowerShell execution policy set to bypass.</description>
+    <mitre>
+      <id>T1059.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="100206" level="5">
+    <if_sid>60009</if_sid>
+    <field name="win.eventdata.contextInfo" type="pcre2">(?i)Invoke-WebRequest|IWR.*-url|IWR.*-InFile</field>
+    <description>Invoke Webrequest executed, possible download cradle detected.</description>
+    <mitre>
+      <id>T1059.001</id>
+    </mitre>
+  </rule>
+
+</group>
+<!-- End Powershell Logging Rule Group -->
+
+<!-- Windows Firewall Loggin -->
+<group name="windows,windows_firewall,firewall,">
+  <rule id="67099" level="7">
+    <if_sid>67001</if_sid>
+    <field name="win.system.eventID">^2099$</field>
+    <description>Windows Firewall With Advanced Security: $(win.eventdata.ruleId) rule has been added to the Windows Defender Firewall exception list.</description>
+    <options>no_full_log</options>
+    <group>pci_dss_1.4,gpg13_4.12,gdpr_IV_35.7.d,hipaa_164.312.a.1,nist_800_53_SC.7,tsc_CC6.7,tsc_CC6.8,</group>
+  </rule>
+
+ <rule id="67097" level="7">
+    <if_sid>67001</if_sid>
+    <field name="win.system.eventID">^2097$</field>
+    <description>Windows Firewall With Advanced Security: $(win.eventdata.ruleId) rule has been modified in the Windows Defender Firewall exception list.</description>
+    <options>no_full_log</options>
+    <group>pci_dss_1.4,gpg13_4.12,gdpr_IV_35.7.d,hipaa_164.312.a.1,nist_800_53_SC.7,tsc_CC6.7,tsc_CC6.8,</group>
+  </rule>
+
+  <rule id="67082" level="7">
+    <if_sid>67001</if_sid>
+    <field name="win.system.eventID">^2082$</field>
+    <description>Windows Firewall With Advanced Security: $(win.eventdata.ruleId) rule in the Windows Defender Firewall exception list.</description>
+    <options>no_full_log</options>
+    <group>pci_dss_1.4,gpg13_4.12,gdpr_IV_35.7.d,hipaa_164.312.a.1,nist_800_53_SC.7,tsc_CC6.7,tsc_CC6.8,</group>
+  </rule>
+
+</group>
+<!-- End Windows Firewall Logging -->
+
+<!-- SFX Archive Monitoring -->
+<group name="sfx_archives">
+  <rule id="100102" level="10">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.CommandLine" type="pcre2">(?i)[C-Z]:.*.\\[7ZipRar_].*sfx.*\\*|.*\\7z.*</field>
+    <description>SFX archive command, $(win.eventdata.CommandLine) invoked the application $(win.eventdata.OriginalFileName).</description>
+    <mitre>
+      <id>T1490</id>
+    </mitre>
+  </rule>
+  
+  <rule id="100103" level="10">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.CurrentDirectory" type="pcre2">(?i)[C-Z]:.*.\\[7ZipRar_].*sfx.*\\*|.*\\7z.*</field>
+    <description>SFX archive command, $(win.eventdata.CommandLine) executed from $(win.eventdata.CurrentDirectory).</description>
+    <mitre>
+      <id>T1490</id>
+    </mitre>
+  </rule>
+
+  <rule id="100104" level="10">
+    <if_sid>61613</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)[C-Z]:.*.\\[7ZipRar_].*sfx.*\\*|.*\\7z.*</field>
+    <description>The file $(win.eventdata.targetFilename) has been created by $(win.eventdata.image). SFX archive activity detected.</description>
+    <mitre>
+      <id>T1486</id>
+    </mitre>
+  </rule>
+
+  <rule id="100105" level="10">
+    <if_sid>92213</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)[C-Z]:.*.\\[7ZipRar_].*sfx.*\\*|.*\\7z.*</field>
+    <description>The file $(win.eventdata.targetFilename) has been created by $(win.eventdata.image). SFX archive activity detected.</description>
+    <mitre>
+      <id>T1486</id>
+    </mitre>
+  </rule>
+  
+  <rule id="100106" level="10">
+    <if_sid>61615</if_sid>
+    <field name="win.eventdata.eventType" type="pcre2" >^SetValue$</field>
+    <field name="win.eventdata.Image" type="pcre2">(?i)[C-Z]:.*.\\[7ZipRar].*sfx.*\\.*</field>
+    <description>The image, $(win.eventdata.image) made a change to the registry at $(win.eventdata.targetObject). SFX archive activity.</description>   
+    <mitre>
+      <id>T1543</id>
+    </mitre>
+  </rule>
+  
+  <rule id="100107" level="10">
+    <if_sid>61609</if_sid>
+    <field name="win.eventdata.ImageLoaded" type="pcre2">(?i)[C-Z]:.*.\\[7ZipRar].*sfx.*exe</field>
+    <description>The image $(win.eventdata.image) loaded a file $(win.eventdata.imageLoaded). SFX archive activity detected.</description>
+  </rule>
+  
+  <rule id="100108" level="10">
+    <if_sid>61609</if_sid>
+    <field name="win.eventdata.Image" type="pcre2">(?i)[C-Z]:.*.\\[7ZipRar].*sfx.*exe</field>
+    <description>The suspicious image, $(win.eventdata.image), loaded the executable $(win.eventdata.imageLoaded). SFX archive activity detected.</description>
+  </rule>
+</group>
+<!-- End SFX Archive Monitoring -->
+
+<!-- Active Directory Attack Monitoring -->
+<group name="security_event, windows,">
+
+  <!-- This rule detects when PsExec is launched remotely to perform lateral movement within the domain. The rule uses Sysmon events collected from the domain controller. -->
+  <rule id="110004" level="12">
+    <if_sid>61600</if_sid>
+    <field name="win.system.eventID" type="pcre2">17|18</field>
+    <field name="win.eventdata.PipeName" type="pcre2">\\PSEXESVC</field>
+    <options>no_full_log</options>
+    <description>PsExec service launched for possible lateral movement within the domain</description>
+  </rule>
+
+  <!-- This rule detects NTDS.dit file extraction using a sysmon event captured on the domain controller -->
+  <rule id="110006" level="12">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.commandLine" type="pcre2">NTDSUTIL</field>
+    <description>Possible NTDS.dit file extraction using ntdsutil.exe</description>
+  </rule>
+
+  <!-- This rule detects Pass-the-ash (PtH) attacks using windows security event 4624 on the compromised endpoint -->
+  <rule id="110007" level="12">
+    <if_sid>60103</if_sid>
+    <field name="win.system.eventID">^4624$</field>
+    <field name="win.eventdata.LogonProcessName" type="pcre2">seclogo</field>
+    <field name="win.eventdata.LogonType" type="pcre2">9</field>
+    <field name="win.eventdata.AuthenticationPackageName" type="pcre2">Negotiate</field>
+    <field name="win.eventdata.LogonGuid" type="pcre2">{00000000-0000-0000-0000-000000000000}</field>
+    <options>no_full_log</options>
+    <description>Possible Pass the hash attack</description>
+  </rule>
+  
+  <!-- This rule detects credential dumping when the command sekurlsa::logonpasswords is run on mimikatz -->
+  <rule id="110008" level="12">
+    <if_sid>61612</if_sid>
+    <field name="win.eventdata.TargetImage" type="pcre2">(?i)\\\\system32\\\\lsass.exe</field>
+    <field name="win.eventdata.GrantedAccess" type="pcre2">(?i)0x1010</field>
+    <description>Possible credential dumping using mimikatz</description>
+  </rule>
+  
+</group>
+<!-- End Active Directory Attack Monitoring -->
+
+<!-- Async RAT Detection -->
+<group name="asyncrat,">
+
+<!-- AsyncRAT execution -->
+<rule id="100401" level="12">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.Image" type="pcre2">\.exe</field>
+    <field name="win.eventdata.OriginalFileName" type="pcre2">Stub\.exe</field>
+    <description>AsyncRAT executed.</description>
+    <mitre>
+        <id>T1204</id>
+    </mitre>
+</rule>
+
+<!-- DLL process injection -->
+<rule id="100402" level="12">
+    <if_sid>61609</if_sid>
+    <field name="win.eventdata.Image" type="pcre2">.*\.exe</field>
+    <field name="win.eventdata.ImageLoaded" type="pcre2">(?i)[c-z]:\\\\Windows\\\\SysWOW64\\\\mscoree\.dll</field>
+    <description>Potential AsyncRAT activity detected: Process $(win.eventdata.ImageLoaded) is injected on $(win.system.computer).</description>
+    <mitre>
+        <id>T1055.001</id>
+    </mitre>
+</rule>
+
+<rule id="100403" level="12">
+    <if_sid>61609</if_sid>
+    <field name="win.eventdata.Image" type="pcre2">.*\.exe</field>
+    <field name="win.eventdata.ImageLoaded" type="pcre2">(?i)[c-z]:\\\\Windows\\\\Microsoft\.NET\\\\Framework\\\\v4\.0\.30319\\\\mscoreei\.dll</field>
+    <description>Potential AsyncRAT activity detected: Process$(win.eventdata.ImageLoaded) is injected on $(win.system.computer).</description>
+    <mitre>
+        <id>T1055.001</id>
+    </mitre>
+</rule>
+
+<rule id="100404" level="12">
+    <if_sid>61609</if_sid>
+    <field name="win.eventdata.Image" type="pcre2">.*\.exe</field>
+    <field name="win.eventdata.ImageLoaded" type="pcre2">(?i)[c-z]:\\\\Windows\\\\Microsoft\.NET\\\\Framework\\\\v4\.0\.30319\\\\clrjit\.dll</field>
+    <description>Potential AsyncRAT activity detected: Process $(win.eventdata.ImageLoaded) is injected on $(win.system.computer).</description>
+    <mitre>
+        <id>T1055.001</id>
+    </mitre>
+</rule>
+
+<!-- Registry creation for persistent -->
+<rule id="100405" level="15">
+    <if_sid>61614</if_sid>
+    <field name="win.eventdata.EventType" type="pcre2">^CreateKey$</field>
+    <field name="win.eventdata.Image" type="pcre2">(?i)[c-z]:\\\\Windows\\\\System32\\\\svchost\.exe</field>
+    <field name="win.eventdata.TargetObject" type="pcre2">HKLM\\\\System\\\\CurrentControlSet\\\\Services\\\\[A-Za-z0-9]+</field>
+    <description>Suspicious registry key creation detected on $(win.system.computer).</description>
+    <mitre>
+        <id>T1543</id>
+    </mitre>
+</rule>
+</group>
+<!-- End Async RAT Detection -->
+
+<!-- Cobalt Strike Beacon Detection -->
+<group name="local,cobalt_strike,beaconing,">
+ 
+  <rule id="106002" level="3">
+    <if_sid>61600</if_sid>
+    <field name="win.system.eventID">^17$</field>
+    <description>A pipe was created. Possible Cobalt Strike activity.</description>
+    <mitre>
+      <id>T1071</id>
+    </mitre>
+  </rule>
+ 
+  <rule id="106003" level="14">
+    <if_sid>106002</if_sid>
+    <field name="win.eventdata.pipeName" type="pcre2">(?i)MSSE-[0-9]{4}-server|msagent_[0-9a-f]{2}|postex</field>
+    <description>A named pipe $(win.eventdata.pipeName) associated with Cobalt Strike beaconing activity was created.</description>
+    <mitre>
+      <id>T1071</id>
+    </mitre>
+  </rule>
+ 
+  <rule id="106004" level="14">
+    <if_sid>106003</if_sid>
+    <field name="win.eventdata.pipeName" type="pcre2">(?i)msagent_[0-9a-f]{2}</field>
+    <description>A named pipe $(win.eventdata.pipeName) associated with Cobalt Strike SMB beaconing activity was created.</description>
+    <mitre>
+      <id>T1071</id>
+      <id>T1572</id>
+    </mitre>
+  </rule>
+ 
+  <rule id="106005" level="14">
+    <if_sid>106003</if_sid>
+    <field name="win.eventdata.pipeName" type="pcre2">(?i)postex_ssh_[0-9a-f]{4}</field>
+    <description>A named pipe $(win.eventdata.pipeName) associated with Cobalt Strike SSH beaconing activity was created.</description>
+    <mitre>
+      <id>T1071</id>
+      <id>T1572</id>
+    </mitre>
+  </rule> 
+
+  <rule id="106007" level="3">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)curl\.exe.+-s</field>
+    <description>Curl - $(win.eventdata.image) - ran in silent mode.</description>
+  </rule>
+ 
+  <rule id="106008" level="3">
+    <if_sid>106007</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)-o</field>
+    <description>Curl ran in silent mode and sent its output to a file.</description>
+  </rule>
+ 
+  <rule id="106009" level="10" timeframe="150" frequency="3">
+    <if_matched_sid>106008</if_matched_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)-o</field>
+    <description>Curl ran in silent mode and sent its output to a file multiple times. Possible beaconing activity.</description>
+  </rule>
+
+  <rule id="106010" level="0">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.originalFileName" type="pcre2">^sc.exe$</field>
+    <description>The service control manager tool was used.</description>
+  </rule>
+ 
+  <rule id="106011" level="3">
+    <if_sid>106010</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)delete</field>
+    <description>A service was deleted. Possible clean up of malicious activity.</description>
+    <mitre>
+      <id>T1050</id>
+      <id>T1070</id>
+    </mitre>
+  </rule>
+</group>
+<!-- End Cobalt Strike Detection -->
+
+
+
+<!-- Example -- >
+<group name="local,syslog,sshd,">
+
+  <!--
+  Dec 10 01:02:02 host sshd[1234]: Failed none for root from 1.1.1.1 port 1066 ssh2
+  -- >
+  <rule id="100001" level="5">
+    <if_sid>5716</if_sid>
+    <srcip>1.1.1.1</srcip>
+    <description>sshd: authentication failed from IP 1.1.1.1.</description>
+    <group>authentication_failed,pci_dss_10.2.4,pci_dss_10.2.5,</group>
+  </rule>
+
+</group>
+-->
